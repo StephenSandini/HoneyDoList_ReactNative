@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, FlatList} from 'react-native';
+import { StyleSheet, Text, View, FlatList, Alert} from 'react-native';
 import Header from './components/header.js';
+import TodoItem from './components/todoItem.js';
+import AddTodo from './components/addTodo.js';
 
 export default function App() {
   const [todos, setTodos] = useState([
@@ -9,16 +11,39 @@ export default function App() {
     {text:'play on the xbox', key:'3'},
   ]);
 
+  const pressHandler = (key) => {
+    setTodos((prevTodos) => {
+      return prevTodos.filter(todo => todo.key != key);
+    })
+  }
+
+  const submitHandler = (text) => {
+    if(text.length > 2){
+      setTodos((prevTodos) => {
+        return [
+          {text: text, key: Math.random().toString()},
+          ...prevTodos
+        ];
+      });
+    } else {
+      Alert.alert('OOPS!', 'Todos must be over 2 chars long.', [
+        {text: 'Understood', onPress: () => console.log('alert closed')}
+      ]);
+    }
+    
+    
+  }
+
   return (
     <View style={styles.container}>
       <Header />
       <View style={styles.content}>
-        {/* to do form*/}
+        <AddTodo submitHandler={submitHandler}/>
         <View style={styles.list}>
           <FlatList 
             data={todos}
             renderItem={({item}) => (
-              <Text>{item.text}</Text>
+            <TodoItem item={item} pressHandler={pressHandler}/>
             )}
           />
         </View>
